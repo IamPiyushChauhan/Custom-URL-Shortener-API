@@ -6,7 +6,7 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/userRoute');
 const mainRoutes = require('./routes/mainRoute');
-
+const apiRoutes = require('./routes/apiRoute');
 app.use(express.json());
 
 const swaggerUi = require('swagger-ui-express');
@@ -38,10 +38,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET 
 }));
 
-app.set('view engine', 'ejs'); 
+app.set('view engine', 'ejs');
 
 app.use('/',mainRoutes);
 app.use('/auth',userRoutes);
+app.use('/api', apiRoutes);   
 
 const swaggerMiddleware = (req, res, next) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
