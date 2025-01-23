@@ -41,8 +41,23 @@ const getRedirectUrl = async (req, res) => {
 }
 
 
+const getAnalyticsAlias = async (req, res) =>{
+    const { alias } = req.params;
+    const userEmail = req.user.email;
+    try {
+        const aliasData = await getAliasDetails(alias,userEmail);
+        return res.status(200).json({
+            ...aliasData
+        });
+    } catch (error) {
+        console.error('Error retrieving analytics:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
 
 module.exports = {
     postUrlShorten,
-    getRedirectUrl
+    getRedirectUrl,
+    getAnalyticsAlias
 };
