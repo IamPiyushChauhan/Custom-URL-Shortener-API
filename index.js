@@ -10,7 +10,6 @@ app.use(express.json());
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./swagger.js');
 
-// MongoDB Connection
 const MONGO_DB_URL = process.env.MONGO_DB_URL;
 
 mongoose.connect(MONGO_DB_URL)
@@ -22,7 +21,6 @@ mongoose.connect(MONGO_DB_URL)
         process.exit(1);
     });
 
-// Error handling for MongoDB connection
 mongoose.connection.on('error', (err) => {
     console.error('MongoDB connection error:', err);
 });
