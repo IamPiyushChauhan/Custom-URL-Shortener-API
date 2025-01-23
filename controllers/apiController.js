@@ -1,6 +1,6 @@
 const { getDeviceType, getOsType, generateShortUrl } = require('../utils/apiUtils');
 const { saveUrlAndGetCreatedAt } = require('../service/urlService');
-const {  saveAnalytics,  getAliasDetails, getTopicDetails, } = require('../service/analyticsService');
+const {  saveAnalytics, getAliasDetails, getTopicDetails, getAllUrlAnalytics } = require('../service/analyticsService');
 
 
 const postUrlShorten = async (req, res) => {
@@ -49,6 +49,7 @@ const getAnalyticsAlias = async (req, res) =>{
         return res.status(200).json({
             ...aliasData
         });
+        
     } catch (error) {
         console.error('Error retrieving analytics:', error);
         return res.status(500).json({ message: 'Internal server error' });
@@ -70,10 +71,23 @@ const  getAnalyticsTopic = async (req, res) =>{
     }
 }
 
+const getOverallAnalytics = async (req, res) =>{
+    const userEmail = req.user.email;
+    try {
+       const topicData =  await getAllUrlAnalytics(userEmail);
+       return res.status(200).json({
+        ...topicData
+    });
+    } catch (error) {
+        console.error('Error fetching overall analytics:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 module.exports = {
     postUrlShorten,
     getRedirectUrl,
     getAnalyticsAlias,
-    getAnalyticsTopic
+    getAnalyticsTopic,
+    getOverallAnalytics
 };

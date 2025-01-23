@@ -127,8 +127,78 @@ const getTopicDetails = async(topic, creatorEmail) =>{
     };
 }
 
+const getAllUrlAnalytics = async(creatorEmail) => {
+    const totalUrls = await AnalyticsModel.distinct('alias', { creatorEmail });
+    const totalClicks = await AnalyticsModel.countDocuments({ creatorEmail });
+
+  
+    const uniqueUsers = await AnalyticsModel.distinct('ipAddress', { creatorEmail });
+
+    const clicksByDate = await AnalyticsModel.aggregate([
+        { $match: { creatorEmail } },
+        {
+            $group: {
+                _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } },
+                totalClicks: { $sum: 1 },
+            },
+        },
+        { $sort: { _id: 1 } },
+    ]);
+
+    const osType = await AnalyticsModel.aggregate([
+        { $match: { creatorEmail } },
+        {
+            $group: {
+                _id: '$osType',
+                uniqueClicks: { $sum: 1 },
+                uniqueUsers: { $addToSet: '$ipAddress' },
+            },
+        },
+        {
+            $project: {
+                osName: '$_id',
+                uniqueClicks: 1,
+                uniqueUsers: { $size: '$uniqueUsers' },
+            },
+        },
+    ]);
+
+    const deviceType = await AnalyticsModel.aggregate([
+        { $match: { creatorEmail } },
+        {
+            $group: {
+                _id: '$deviceType',
+                uniqueClicks: { $sum: 1 },
+                uniqueUsers: { $addToSet: '$ipAddress' },
+            },
+        },
+        {
+            $project: {
+                deviceName: '$_id',
+                uniqueClicks: 1,
+                uniqueUsers: { $size: '$uniqueUsers' },
+            },
+        },
+    ]);
+
+    return {
+        totalUrls,
+        totalClicks,
+        uniqueUsers,
+        clicksByDate: clicksByDate.map(({ _id, totalClicks }) => ({
+            date: _id,
+            totalClicks,
+        })),
+        osType,
+        deviceType,
+    };
+
+}
+
 module.exports  = {
     saveAnalytics,
     getAliasDetails,
-    getTopicDetails
+    getTopicDetails,
+    getAllUrlAnalytics
+
 }
