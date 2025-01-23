@@ -1,5 +1,5 @@
 const swagger = {
-    swagger: "3.0",
+    openapi: "3.1.0",
     info: {
       description: "This API allows users to create and manage short URLs, including features like custom aliases and rate limiting.",
       version: "1.0.0",
