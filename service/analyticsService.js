@@ -85,7 +85,50 @@ const getAliasDetails = async(alias, creatorEmail)=> {
 }
 
 
+const getTopicDetails = async(topic, creatorEmail) =>{
+    const analytics = await AnalyticsModel.aggregate([
+        { $match: { topic , creatorEmail} },
+        {
+            $group: {
+                _id: "$alias",
+                totalClicks: { $count: {} },
+                uniqueUsers: { $addToSet: "$ipAddress" },
+                timestamps: { $push: "$timestamp" }
+            }
+        }
+    ]);
+    console.log({analytics})
+    const totalClicks = analytics.reduce((sum, data) => sum + data.totalClicks, 0);
+    const uniqueUsersSet = new Set(analytics.flatMap(data => data.uniqueUsers));
+    const uniqueUsers = uniqueUsersSet.size;
+
+    // Calculate clicks by date
+    const clicksByDateMap = new Map();
+    analytics.forEach(data => {
+        data.timestamps.forEach(timestamp => {
+            const date = timestamp.toISOString().split('T')[0];
+            clicksByDateMap.set(date, (clicksByDateMap.get(date) || 0) + 1);
+        });
+    });
+    const clicksByDate = Array.from(clicksByDateMap.entries()).map(([date, clicks]) => ({ date, clicks }));
+
+    // Transform aggregated results
+    const urls = analytics.map(data => ({
+        shortUrl: data._id,
+        totalClicks: data.totalClicks,
+        uniqueUsers: data.uniqueUsers.length
+    }));
+
+    return{
+        totalClicks,
+        uniqueUsers,
+        clicksByDate,
+        urls
+    };
+}
+
 module.exports  = {
     saveAnalytics,
-    getAliasDetails
+    getAliasDetails,
+    getTopicDetails
 }
