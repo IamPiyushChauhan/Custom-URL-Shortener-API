@@ -4,6 +4,8 @@ const express = require('express');
 const app = express(); 
 const session = require('express-session');
 const mongoose = require('mongoose');
+const userRoutes = require('./routes/userRoute');
+const mainRoutes = require('./routes/mainRoute');
 
 app.use(express.json());
 
@@ -37,6 +39,9 @@ app.use(session({
 }));
 
 app.set('view engine', 'ejs'); 
+
+app.use('/',mainRoutes);
+app.use('/auth',userRoutes);
 
 const swaggerMiddleware = (req, res, next) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
