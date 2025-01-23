@@ -1,7 +1,7 @@
 const { getDeviceType, getOsType, generateShortUrl } = require('../utils/apiUtils');
 const { saveUrlAndGetCreatedAt } = require('../service/urlService');
 const {  saveAnalytics, getAliasDetails, getTopicDetails, getAllUrlAnalytics } = require('../service/analyticsService');
-
+require('dotenv').config();
 
 const postUrlShorten = async (req, res) => {
     try {
@@ -10,7 +10,7 @@ const postUrlShorten = async (req, res) => {
         const shortUrl = customAlias || generateShortUrl();
         const createdAt  =  await saveUrlAndGetCreatedAt(longUrl, shortUrl, customAlias, topic, email);
         return res.status(201).json({
-            shortUrl: `${process.env.BASE_URL}/${shortUrl}`,
+            shortUrl: `${process.env.BASE_URL}/api/shorten/${shortUrl}`,
             createdAt
         });
     } catch (error) {
