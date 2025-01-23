@@ -43,7 +43,7 @@ const swagger = {
                 example: {
                   longUrl: "https://www.example.com",
                   customAlias: "exampleAlias",
-                  topic: "technology",
+                  topic: "activation",
                 },
               },
             },
